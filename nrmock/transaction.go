@@ -5,16 +5,20 @@ import (
 
 	"net/http/httptest"
 
-	"github.com/newrelic/go-agent"
+	newrelic "github.com/newrelic/go-agent"
 )
 
 type Transaction struct {
 	http.ResponseWriter
+	newrelic.Transaction
 
 	name     string
 	WasEnded bool
 
 	attributes map[string]interface{}
+
+	application newrelic.Application
+	newrelic.WebRequest
 }
 
 func NewTransaction(name string) *Transaction {
@@ -76,6 +80,35 @@ func (t *Transaction) AddAttribute(key string, val interface{}) error {
 
 	t.attributes[key] = val
 
+	return nil
+}
+
+func (t *Transaction) Application() newrelic.Application {
+	return t.application
+}
+
+func (t *Transaction) BrowserTimingHeader() (*newrelic.BrowserTimingHeader, error) {
+	return &newrelic.BrowserTimingHeader{}, nil
+}
+
+func (t *Transaction) GetLinkingMetadata() newrelic.LinkingMetadata {
+	return newrelic.LinkingMetadata{}
+}
+
+func (t *Transaction) GetTraceMetadata() newrelic.TraceMetadata {
+	return newrelic.TraceMetadata{}
+}
+
+func (t *Transaction) IsSampled() bool {
+	return false
+}
+
+func (t *Transaction) NewGoroutine() newrelic.Transaction {
+	return t
+}
+
+func (t *Transaction) SetWebRequest(req newrelic.WebRequest) error {
+	t.WebRequest = req
 	return nil
 }
 

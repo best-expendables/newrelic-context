@@ -4,11 +4,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/newrelic/go-agent"
+	newrelic "github.com/newrelic/go-agent"
 )
 
 type NewrelicApp struct {
-	Tnx *Transaction
+	Tnx         *Transaction
+	CustomEvent map[string]map[string]interface{}
 }
 
 func (a *NewrelicApp) StartTransaction(name string, w http.ResponseWriter, r *http.Request) newrelic.Transaction {
@@ -21,6 +22,7 @@ func (a *NewrelicApp) StartTransaction(name string, w http.ResponseWriter, r *ht
 }
 
 func (a *NewrelicApp) RecordCustomEvent(eventType string, params map[string]interface{}) error {
+	a.CustomEvent[eventType] = params
 	return nil
 }
 func (a *NewrelicApp) WaitForConnection(timeout time.Duration) error {
